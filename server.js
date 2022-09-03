@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const colors = require("colors");
 
+const errorHandler = require("./middleware/error");
+
 const connectDB = require("./config/db");
 
 // Load environment variables. Import it at top as others are relying on it
@@ -27,6 +29,9 @@ if (process.env.NODE_ENV === "development") {
 
 // Mount routers
 app.use("/api/v1/bootcamps", bootcamps);
+
+// make sure error handler is mounted at last ie after the api routes
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
