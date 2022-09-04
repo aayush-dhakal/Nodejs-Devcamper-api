@@ -31,7 +31,8 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   );
 
   // finding resource
-  query = Bootcamp.find(JSON.parse(queryStr)); // parsing ie converting to json again for query operation
+  // populating courses cause of virtuals
+  query = Bootcamp.find(JSON.parse(queryStr)).populate("courses"); // parsing ie converting to json again for query operation
 
   // select fields
   if (req.query.select) {
@@ -166,13 +167,18 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @route     DELETE /api/v1/bootcamps/:id
 // @access    Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  // if we use findByIdAndDelete then the pre middleware will not trigger, the one we are using for deleting the courses when the bootcamp is deleted in Bootcamp model so use find by Id then call remove function manually
+  // const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+  const bootcamp = await Bootcamp.findById(req.params.id);
 
   if (!bootcamp) {
     return next(
       new ErroResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
     );
   }
+
+  // this will trigger the middleware
+  bootcamp.remove();
 
   res.status(200).json({
     success: true,
