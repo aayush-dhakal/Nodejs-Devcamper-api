@@ -11,22 +11,23 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   let query;
 
   if (req.params.bootcampId) {
-    query = Course.find({ bootcamp: req.params.bootcampId });
+    // we don't want pagination and other stuffs when we are fetching courses for a particular bootcamp
+    const courses = await Course.find({ bootcamp: req.params.bootcampId });
+
+    return res.status(200).json({
+      success: true,
+      count: courses.length,
+      data: courses,
+    });
   } else {
-    // query = Course.find().populate("bootcamp"); // also adds the entire bootcamp data in that field
-    query = Course.find().populate({
-      path: "bootcamp",
-      select: "name description",
-    }); // adds the name and description from the associated bootcamp model
+    // query = Course.find().populate("bootcamp"); // this adds the entire bootcamp data in that field
+    // query = Course.find().populate({
+    //   path: "bootcamp",
+    //   select: "name description",
+    // }); // adds the name and description from the associated bootcamp model
+
+    res.status(200).json(res.advancedResults);
   }
-
-  const courses = await query;
-
-  res.status(200).json({
-    success: true,
-    count: courses.length,
-    data: courses,
-  });
 });
 
 // @desc      Get single course
