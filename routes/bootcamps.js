@@ -9,6 +9,7 @@ const {
   bootcampPhotoUpload,
 } = require("../controllers/bootcamps");
 const Bootcamp = require("../models/Bootcamp");
+const { protect, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -22,18 +23,20 @@ router.use("/:bootcampId/courses", courseRouter); // this will call /api/v1/cour
 
 router.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
 
-router.route("/:id/photo").put(bootcampPhotoUpload);
+router
+  .route("/:id/photo")
+  .put(protect, authorize("publisher", "admin"), bootcampPhotoUpload); // make sure to put authorize middleware after protect because it depends on the req.user set by protect middleware
 
 // if the url is /api/v1/bootcamp with get method then it will call the getBootcamp controller and if post method then createBootcamp
 router
   .route("/")
   .get(advancedResults(Bootcamp, "courses"), getBootcamps)
-  .post(createBootcamp);
+  .post(protect, authorize("publisher", "admin"), createBootcamp);
 
 router
   .route("/:id")
   .get(getBootcamp)
-  .put(updateBootcamp)
-  .delete(deleteBootcamp);
+  .put(protect, authorize("publisher", "admin"), updateBootcamp)
+  .delete(protect, authorize("publisher", "admin"), deleteBootcamp);
 
 module.exports = router;
