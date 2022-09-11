@@ -5,6 +5,12 @@ const morgan = require("morgan");
 const colors = require("colors");
 const fileupload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimit = require("express-rate-limit");
+const hpp = require("hpp");
+const cors = require("cors");
 
 const errorHandler = require("./middleware/error");
 
@@ -39,6 +45,29 @@ if (process.env.NODE_ENV === "development") {
 
 // File uploading
 app.use(fileupload());
+
+// Sanitize data
+app.use(mongoSanitize()); // basically stops the usage of special mongo db operators like $gt
+
+// Set security headers
+app.use(helmet());
+
+// Prevent XSS attacks
+app.use(xss()); // prevents the insertion of html tags. Like it converts <script> into &lt;script>
+
+// Rate limiting
+const limiter = rateLimit({
+  // 100 requests per 10 minutes are allowed
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100,
+});
+app.use(limiter);
+
+// Prevent http param pollution
+app.use(hpp());
+
+// Enable CORS
+app.use(cors()); // it makes the api available in all origins ie public
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
