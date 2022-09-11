@@ -4,8 +4,8 @@ const {
   login,
   getMe,
   // logout,
-  // forgotPassword,
-  // resetPassword,
+  forgotPassword,
+  resetPassword,
   // updateDetails,
   // updatePassword
 } = require("../controllers/auth");
@@ -20,7 +20,7 @@ router.get("/me", protect, getMe);
 // router.get('/logout', logout);
 // router.put('/updatedetails', protect, updateDetails);
 // router.put('/updatepassword', protect, updatePassword);
-// router.post('/forgotpassword', forgotPassword);
-// router.put('/resetpassword/:resettoken', resetPassword);
+router.post("/forgotpassword", forgotPassword);
+router.put("/resetpassword/:resettoken", resetPassword);
 
 module.exports = router;
