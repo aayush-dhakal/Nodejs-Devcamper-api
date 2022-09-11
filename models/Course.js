@@ -51,6 +51,7 @@ const CourseSchema = new mongoose.Schema({
 // courses.goFish()
 
 // Static method to get average of course tuitions
+// Get the average tutition cost of all the courses for a specific bootcamp and populate that averageCost filed in bootcamp model. So now whenever you fetch all the bootcamps you will also get the averageCost field in the response
 CourseSchema.statics.getAverageCost = async function (bootcampId) {
   // obj returns an array with field like [{ _id: new ObjectId("5d725a1b7b292f5f8ceff788"), averageCost: 10000 }]
   const obj = await this.aggregate([
